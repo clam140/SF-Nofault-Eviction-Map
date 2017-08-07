@@ -19,12 +19,12 @@ shinyUI(
                       draggable = TRUE, 
                       class = "panel panel-default", 
                       height = "auto",
-                      h3("No-Fault Evictions in", br(), "San Francisco 2012-2016", align = "center"),
+                      h3("No-Fault Evictions in", br(), "San Francisco 1997-2016", align = "center"),
                       sliderInput("date",
                                   "File Date",
-                                  min = as.Date("2012-01-01"),
+                                  min = as.Date("1997-01-01"),
                                   max = as.Date("2016-09-01"),
-                                  value = as.Date("2014-01-01"),
+                                  value = as.Date("2009-01-01"),
                                   step = 28,
                                   timeFormat = "%m/%Y",
                                   ticks = F),
@@ -35,7 +35,7 @@ shinyUI(
                                   choices = Choices, 
                                   selected = "ALL", 
                                   multiple = F),
-                      helpText("By Caleb Lam. Still in development.")
+                      helpText("By Caleb Lam. Click markers for location info")
                       )
         )
         )
