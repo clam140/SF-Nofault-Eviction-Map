@@ -4,6 +4,7 @@ library(plyr)
 library(dplyr)
 library(magrittr)
 library(rgdal)
+library(rgeos)
 library(ggplot2)
 library(lubridate)
 library(RColorBrewer)
@@ -20,8 +21,7 @@ shinyServer(function(input,output){
 
         
         output$EvictMap <- renderLeaflet({
-
-                leaflet(ZIPpolygons) %>% 
+                leaflet() %>% 
                         addProviderTiles(providers$CartoDB.Positron) %>%
                         setView(lat = 37.75816, 
                                 lng = -122.47, 
@@ -30,48 +30,23 @@ shinyServer(function(input,output){
                                   values = evictionRawData$Reason, 
                                   title = "Eviction Reasons", 
                                   position = 'bottomright')
-
                 })
 
         observe({
                 func()
-                if (nrow(evictionData) == 0) {
-                        leafletProxy("EvictMap", data = ZIPpolygons) %>%
+                        leafletProxy("EvictMap", data = neighPoly.Final) %>%
                                 clearShapes() %>%
                                 removeControl(layerId = "evictLegend") %>%
                                 addPolygons(group = "polygons",
                                             stroke = TRUE, 
                                             weight = 1, 
                                             color = "black",
-                                            fillColor = ~polyPal(as.numeric(ZIPpolygons$n)), 
+                                            fillColor = ~polyPal(as.numeric(neighPoly.Final$n)), 
                                             opacity = 0.5, 
                                             fillOpacity = 0.5, 
                                             smoothFactor = 0.05,
-                                            label = sprintf("<strong>Zip Code:<strong> %s <br/> %g evictions since 2012", 
-                                                             ZIPpolygons$zip, ZIPpolygons$n) %>% lapply(htmltools::HTML),
-                                            highlightOptions = highlightOptions(color = "black", 
-                                                                                weight = 5,
-                                                                                bringToFront = TRUE)) %>%
-                                addLegend(layerId = "evictLegend",
-                                          title = paste(reason, br(), "evictions since 2012", sep = ""),
-                                          pal = polyPal, 
-                                          values = c(0,legendCount), 
-                                          opacity = 0.7,
-                                          position = "bottomright")
-                } else {
-                        leafletProxy("EvictMap", data = ZIPpolygons) %>%
-                                clearShapes() %>%
-                                removeControl(layerId = "evictLegend") %>%
-                                addPolygons(group = "polygons",
-                                            stroke = TRUE, 
-                                            weight = 1, 
-                                            color = "black",
-                                            fillColor = ~polyPal(as.numeric(ZIPpolygons$n)), 
-                                            opacity = 0.5, 
-                                            fillOpacity = 0.5, 
-                                            smoothFactor = 0.05,
-                                            label = sprintf("<strong>Zip Code:<strong> %s <br/> %g evictions since 2012", 
-                                                            ZIPpolygons$zip, ZIPpolygons$n) %>% lapply(htmltools::HTML),
+                                            label = sprintf("<strong>Neighborhood:<strong> %s <br/> %g evictions since 1997", 
+                                                            neighPoly.Final$nhood, neighPoly.Final$n) %>% lapply(htmltools::HTML),
                                             highlightOptions = highlightOptions(color = "black", weight = 5)) %>%
                                 addCircles(group = "circles",
                                         layerId = evictionData$layerID,
@@ -79,26 +54,32 @@ shinyServer(function(input,output){
                                         lat = evictionData$lat,
                                         color = ~circlePal(evictionData$Reason),
                                         fillColor = ~circlePal(evictionData$Reason),
-                                        label = sprintf("<strong>Address:<strong> %s<br/>Neighborhood: %s",
-                                                       evictionData$Address, evictionData$Neighborhoods...Analysis.Boundaries) %>% 
-                                                lapply(htmltools::HTML),
-                                        highlightOptions = highlightOptions(color = "black", weight = 5),
+                                        # label = sprintf("<strong>Address:<strong> %s<br/>",
+                                        #                evictionData$Address) %>% 
+                                        #         lapply(htmltools::HTML),
+                                        #highlightOptions = highlightOptions(color = "black", weight = 5),
+                                        popup = paste("Address: ", paste(sep = "",
+                                                                         "<b><a href='http://www.google.com/maps/place/",
+                                                                         gsub(" ","+", evictionData$Address),
+                                                                         ",+San+Francisco,+CA' target = 'blank'>",
+                                                                         evictionData$Address,
+                                                                         "</a></b>")),
+                                        popupOptions = popupOptions(closeOnClick = TRUE),
                                         opacity = 1,
                                         fillOpacity = 0.5,
                                         radius = 40,
                                         stroke = TRUE) %>%
                                 addLegend(layerId = "evictLegend",
-                                          title = paste(reason, br(), "evictions since 2012", sep = ""),
+                                          title = paste(reason, br(), "evictions since 1997", sep = ""),
                                           pal = polyPal, 
                                           values = c(0,legendCount), 
                                           opacity = 0.7, 
                                           position = "bottomright")
-
-                }
-
-                        
+                        })
         })
-})
+
+
+
 
 
 
