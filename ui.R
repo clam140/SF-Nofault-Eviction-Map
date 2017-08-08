@@ -35,7 +35,9 @@ shinyUI(
                                   choices = Choices, 
                                   selected = "ALL", 
                                   multiple = F),
-                      helpText("By Caleb Lam. Click markers for location info")
+                      HTML("<b><a href='https://github.com/clam140/SF-Nofault-Eviction-Map' 
+                           target = 'blank'>Source Code</a></b>"),
+                      h6("By Caleb Lam. Click markers for location info.")
                       )
         )
         )
