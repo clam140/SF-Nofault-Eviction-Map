@@ -79,3 +79,4 @@ shinyServer(function(input,output){
                                   position = "bottomright")
                 })
         })
+ 
