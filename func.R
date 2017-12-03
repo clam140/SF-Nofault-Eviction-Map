@@ -53,8 +53,7 @@ circlePal <- colorFactor(c("green", "blue", "red"), evictionRawData$Reason)
 unifyFunc <- function(D, R){
         if(length(D) == 2){
                 subsetFuncRange(D[1], D[2], R)
-        } 
-        if(length(D) == 1){
+        } else {
                 subsetFuncSingle(D, R)
         }
 }
